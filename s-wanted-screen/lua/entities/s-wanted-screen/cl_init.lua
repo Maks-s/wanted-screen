@@ -19,6 +19,7 @@ end)
 ---------------------------------------------------------------------------]]
 
 local matIcon = Material( "materials/slownls/wanted_screen/siren.png" )
+local matIconBg = Material( "materials/slownls/wanted_screen/bg.jpg" )
 local matIconLoad = Material( "materials/slownls/wanted_screen/loader.png" )
 
 --[[-------------------------------------------------------------------------
@@ -76,6 +77,10 @@ function ENT:Draw()
 
     cam.Start3D2D( pos, ang, 0.1 )
 	    draw.RoundedBox( 6, 0, 0, 558, 335, Color( 30, 30, 30, 255 ) )
+
+	    surface.SetDrawColor( color_white )
+		surface.SetMaterial( matIconBg )
+		surface.DrawTexturedRect( 0, 0, 558, 335 )
 
 	    if !self.Loaded then
 	    	surface.SetDrawColor( color_white )
