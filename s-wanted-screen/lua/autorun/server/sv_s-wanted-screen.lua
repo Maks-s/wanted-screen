@@ -8,6 +8,7 @@ util.AddNetworkString( "S:WantedScreen:Update" )
 
 resource.AddFile( "materials/slownls/wanted_screen/siren.png" )
 resource.AddFile( "materials/slownls/wanted_screen/loader.png" )
+resource.AddFile( "materials/slownls/wanted_screen/bg.png" )
 
 --[[-------------------------------------------------------------------------
 	Functions
@@ -66,17 +67,11 @@ end
 ---------------------------------------------------------------------------]]
 
 hook.Add( "playerUnWanted", "S:WantedScreen:UnWanted", function( pPlayer1, pPlayer2 )
-	for k,v in pairs( SAddons.WantedScreen.Ents ) do
-		if IsValid( v ) then
-			if v:GetPlayerWanted() == pPlayer1 then
-				local pPlayer = SAddons.WantedScreen:GetNextPlayer( v )
+	SAddons.WantedScreen:UpdateScreens()
+end)
 
-				v:SetPlayerWanted( pPlayer )
-			end
-		else
-			SAddons.WantedScreen.Ents[k] = nil
-		end
-	end
+hook.Add( "playerWanted", "S:WantedScreen:Wanted", function( pPlayer1, pPlayer2 )
+	SAddons.WantedScreen:UpdateScreens()
 end)
 
 --[[-------------------------------------------------------------------------
