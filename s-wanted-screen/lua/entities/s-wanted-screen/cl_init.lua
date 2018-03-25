@@ -33,6 +33,36 @@ SAddons.WantedScreen.Mdl:SetVisible( false )
 SAddons.WantedScreen.Mdl:SetPaintedManually( true )
 SAddons.WantedScreen.Mdl:PerformLayout()
 
+--[[-------------------------------------------------------------------------
+	Wanted message too long
+---------------------------------------------------------------------------]]
+local specialReason = {}
+
+hook.Add( "DarkRPVarChanged", "S-Wanted-Screen:Wanted:Manipulation", function(ply, var, _, value)
+	if var == "wantedReason" then
+		if value then
+			if surface.GetTextSize( value ) > 270 then
+				surface.SetFont( "Trebuchet24" )
+				local newReason = ""
+				specialReason[ ply ] = {}
+
+				for i=1, #value do
+					if value[i] == "\n" then continue end -- ignore les retour a la ligne
+					if surface.GetTextSize(newReason .. value[i]) >= 270 then
+						table.insert(specialReason[ ply ], newReason)
+						newReason = value[i]
+						continue
+					end
+					newReason = newReason .. value[i]
+				end
+				table.insert(specialReason[ ply ], newReason)
+			end
+		else
+			specialReason[ ply ] = nil
+		end
+	end
+end)
+
 function ENT:StartLoading( boolP )
 	if boolP then
 		if !IsValid( self:GetPlayerWanted() ) then self.Loaded = true return end
@@ -108,7 +138,13 @@ function ENT:Draw()
 			draw.SimpleText( self:GetPlayerWanted():Nick(), "Trebuchet24", 280, 110, color_white )
 
 	        draw.SimpleText( "Raison de la recherche", "Trebuchet24", 280, 150, color_white )
-			draw.SimpleText( self:GetPlayerWanted():getDarkRPVar('wantedReason'), "Trebuchet24", 280, 175, color_white )
+	        if specialReason[ self:GetPlayerWanted() ] then
+	        	for i=1, #specialReason[ self:GetPlayerWanted() ] do
+	        		draw.SimpleText( specialReason[ self:GetPlayerWanted() ][i], "Trebuchet24", 280, 155 + 20*i, color_white )
+	        	end
+	        else
+				draw.SimpleText( self:GetPlayerWanted():getDarkRPVar('wantedReason'), "Trebuchet24", 280, 175, color_white )
+			end
 		end
     cam.End3D2D()
 end
