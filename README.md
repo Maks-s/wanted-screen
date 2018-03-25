@@ -8,3 +8,5 @@
 
 # Suggestions
 Si vous avez des suggestions au niveau de l'addon ( ou autre addon ) n'hésitez pas à me le dire :)
+
+http://steamcommunity.com/sharedfiles/filedetails/?id=1341860600
