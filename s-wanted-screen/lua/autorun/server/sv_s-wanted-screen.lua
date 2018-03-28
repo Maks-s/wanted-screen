@@ -14,20 +14,18 @@ resource.AddFile( "materials/slownls/wanted_screen/bg.png" )
 	Functions
 ---------------------------------------------------------------------------]]
 
-function SAddons.WantedScreen:GetNextPlayer( ent )
-	if !ent then return end
-	if !IsValid( ent ) then return end
+local intCurrentID = 0
 
-	local tblWantedList = ent.tblWantedList
-	local intNextTbl = ent.intCurrentID + 1
+function SAddons.WantedScreen:GetNextPlayer( tblWantedList )
+	local intNextTbl = intCurrentID + 1
 
-	if intNextTbl > #ent.tblWantedList then
-		ent.intCurrentID = 1
+	if intNextTbl > #tblWantedList then
+		intCurrentID = 1
 	else
-		ent.intCurrentID = intNextTbl
+		intCurrentID = intNextTbl
 	end
 
-	return tblWantedList[ ent.intCurrentID ] or nil
+	return tblWantedList[ intCurrentID ]
 end
 
 function SAddons.WantedScreen:GetPlayersWanted()
@@ -44,22 +42,23 @@ end
 
 function SAddons.WantedScreen:UpdateScreens()
 	local tblWantedList = SAddons.WantedScreen:GetPlayersWanted()
+	local pPlayer = SAddons.WantedScreen:GetNextPlayer( tblWantedList )
 
-	for k,v in pairs( SAddons.WantedScreen.Ents ) do
-		if IsValid( v ) then
-			SAddons.WantedScreen.Ents[k].tblWantedList = tblWantedList
-
-			local pPlayer = SAddons.WantedScreen:GetNextPlayer( v )
-
-			v:SetPlayerWanted( pPlayer )
+	for i=1, #SAddons.WantedScreen.Ents do
+		if IsValid( SAddons.WantedScreen.Ents[i] ) then
+			if pPlayer ~= SAddons.WantedScreen.Ents[i]:GetPlayerWanted() then
+				SAddons.WantedScreen.Ents[i]:SetPlayerWanted( pPlayer )
+			end
 		else
-			SAddons.WantedScreen.Ents[k] = nil
+			SAddons.WantedScreen.Ents[i] = nil
 		end
 	end
-
-	net.Start( "S:WantedScreen:Update" )
-	net.WriteTable( SAddons.WantedScreen.Ents or {} )
-	net.Broadcast()
+	
+	if !SAddons.WantedScreen.DoFade then
+		net.Start( "S:WantedScreen:Update" )
+		net.WriteTable( SAddons.WantedScreen.Ents or {} )
+		net.Broadcast()
+	end
 end
 
 --[[-------------------------------------------------------------------------
@@ -78,7 +77,6 @@ end)
 	Timer To Update Screens
 ---------------------------------------------------------------------------]]
 
-timer.Destroy( "S:WantedScreen:Update" )
 timer.Create( "S:WantedScreen:Update", SAddons.WantedScreen.TimeToUpdate, 0, function()
 	SAddons.WantedScreen:UpdateScreens()
 end)

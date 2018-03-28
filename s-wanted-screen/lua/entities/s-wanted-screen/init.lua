@@ -11,7 +11,13 @@ function ENT:Initialize()
 	self:SetUseType( SIMPLE_USE )
 
 	table.insert( SAddons.WantedScreen.Ents, self )
+end
 
-	self.tblWantedList = SAddons.WantedScreen:GetPlayersWanted()
-	self.intCurrentID = 0
+function ENT:OnRemove()
+	for i=1, #SAddons.WantedScreen.Ents do
+		if SAddons.WantedScreen.Ents[i] == self then
+			table.remove(SAddons.WantedScreen.Ents, i)
+			break
+		end
+	end
 end
